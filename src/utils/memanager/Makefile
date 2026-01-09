@@ -3,8 +3,8 @@ CFLAGS = -Wall -Wextra -std=c17 -pedantic
 CFLAGS += -I../../../include
 
 # Build mode
-DEBUG ?= 0
-ifeq ($(DEBUG),1)
+BUILD ?= release
+ifeq ($(BUILD),debug)
     CFLAGS += -g -O0 -DDEBUG
 else
     CFLAGS += -O2 -DNDEBUG

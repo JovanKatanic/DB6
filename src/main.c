@@ -1,5 +1,7 @@
 #include "utils/memanager/context.h"
+#include "utils/comap/comap.h"
 #include <stdio.h>
+#include <pthread.h>
 
 MemoryContext *createSetContext(char *name)
 {
@@ -43,15 +45,34 @@ MemoryContext *createSlabContext(char *name)
 
 int main(void)
 {
-    MemoryContext *context = createSlabContext("context");
-    MemoryContext *context_child_1 = createSlabContext("child1");
-    MemoryContext *context_child_2 = createSlabContext("child2");
-    printf("%p %p %p\n", (void *)context, (void *)context_child_1, (void *)context_child_2);
+    // MemoryContext *context = createSlabContext("context");
+    //  MemoryContext *context_child_1 = createSlabContext("child1");
+    //  MemoryContext *context_child_2 = createSlabContext("child2");
+    //  printf("%p %p %p\n", (void *)context, (void *)context_child_1, (void *)context_child_2);
 
-    SwitchTo(context_child_1);
-    Delete();
-    SwitchTo(context);
-    Delete();
+    // SwitchTo(context_child_1);
+    // Delete();
+    // SwitchTo(context);
+    // Delete();
+
+    createSlabContext("context");
+
+    CoHmap *map = CreateCoHmap(16, 1.0, sizeof(int));
+    for (int i = 0; i < 16; i++)
+    {
+        Block bl1 = Alloc(sizeof(int));
+        *(int *)bl1.data = i + 1;
+        Block bl2 = Alloc(sizeof(int));
+        *(int *)bl2.data = i + 2;
+        Put(map, bl1.data, bl2.data);
+    }
+
+    PrintCoHmap(map);
+    int a = 1;
+    int *val = (int *)Get(map, &a);
+    printf("tada %d\n", *val);
+
+    printf("Main: Both threads created successfully\n");
 
     return 0;
 }

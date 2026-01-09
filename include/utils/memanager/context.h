@@ -35,6 +35,7 @@ extern _Thread_local MemoryContext *CURRENT_CONTEXT;
 
 /* Public API */
 MemoryContext *CreateSetAllocContext(char *name);
+MemoryContext *CreateSetAllocContextInternal(char *name);
 MemoryContext *CreateSlabAllocContext(char *name, uint32 slabSize);
 Block Alloc(uint32 size);
 void Free(Block block);

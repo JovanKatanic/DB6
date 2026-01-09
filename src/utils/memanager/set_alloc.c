@@ -103,6 +103,48 @@ MemoryContext *CreateSetAllocContext(char *name)
     return ctx;
 }
 
+MemoryContext *CreateSetAllocContextInternal(char *name)
+{
+    uint32 block_header = MAXALIGN(sizeof(MemBlock));
+    uint32 context_header = MAXALIGN(sizeof(MemorySetContext));
+    uint32 tot_capacity = block_header + context_header + INITIAL_CAPACITY;
+
+    uint8 *buffer = malloc(tot_capacity);
+    if (buffer == NULL)
+        panic("Failed to allocate block");
+
+    // Calculate offsets of block and context metadata
+
+    MemBlock *block = (MemBlock *)buffer;
+
+    uint8 *context_start = buffer + block_header;
+
+    MemorySetContext *context = (MemorySetContext *)context_start;
+
+    uint8 *data_start = context_start + context_header;
+
+    // Initialize values for block and context metadata
+
+    block->capacity = INITIAL_CAPACITY;
+    block->start = buffer;
+    block->curr = data_start;
+    block->end = buffer + tot_capacity;
+    block->next = NULL;
+
+    MemoryContext base = {
+        .name = name,
+        .parent = CURRENT_CONTEXT,
+        .methods = &AllocSetMethods,
+        .children = NULL,
+        .next = NULL};
+
+    context->base = base;
+    context->blocks = block;
+    context->currblock = block;
+
+    return (MemoryContext *)context;
+}
+
 static MemBlock *initBlock(uint32 capacity)
 {
     uint32 header = MAXALIGN(sizeof(MemBlock));
