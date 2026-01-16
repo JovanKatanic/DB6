@@ -19,12 +19,8 @@ TARGET := $(BIN_DIR)/app
 MAIN_SRC := src/main.c
 MAIN_OBJ := $(OBJ_DIR)/main.o
 
-MEMANAGER_DIR := src/utils/memanager
-MEMANAGER_LIB := $(MEMANAGER_DIR)/libmemanager.a
-
-
-COHMAP_DIR := src/utils/comap
-COHMAP_LIB := $(COHMAP_DIR)/comap.a
+UTILS_DIR := src/utils
+UTILS_LIB := $(UTILS_DIR)/utils.a
 
 all: $(TARGET)
 
@@ -35,28 +31,32 @@ $(BIN_DIR):
 $(OBJ_DIR):
 	mkdir -p $(OBJ_DIR)
 
-# Build memanager
-$(MEMANAGER_LIB):
-	$(MAKE) -C $(MEMANAGER_DIR) BUILD=$(BUILD)
+# Build utils
+$(UTILS_LIB):
+	$(MAKE) -C $(UTILS_DIR) BUILD=$(BUILD)
 
 # Build memanager
-$(COHMAP_LIB):
-	$(MAKE) -C $(COHMAP_DIR) BUILD=$(BUILD)
+# $(COHMAP_LIB):
+# 	$(MAKE) -C $(COHMAP_DIR) BUILD=$(BUILD)
 
 # Compile main.c
 $(MAIN_OBJ): $(MAIN_SRC) | $(OBJ_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # Link final executable
-$(TARGET): $(MAIN_OBJ) $(MEMANAGER_LIB) $(COHMAP_LIB) | $(BIN_DIR)
-	$(CC) $(MAIN_OBJ) $(MEMANAGER_LIB) $(COHMAP_LIB) -o $@ $(LDFLAGS)
+$(TARGET): $(MAIN_OBJ) $(UTILS_LIB) | $(BIN_DIR)
+	$(CC) $(MAIN_OBJ) $(UTILS_LIB) -o $@ $(LDFLAGS)
+
+# $(TARGET): $(MAIN_OBJ) $(UTILS_LIB) $(UTILS_LIB2) | $(BIN_DIR)
+# 	$(CC) $(MAIN_OBJ) $(UTILS_LIB) $(UTILS_LIB2) -o $@ $(LDFLAGS)
+
 
 run: $(TARGET)
 	./$(TARGET)
 
 clean:
-	$(MAKE) -C $(MEMANAGER_DIR) clean
-	$(MAKE) -C $(COHMAP_DIR) clean
+	$(MAKE) -C $(UTILS_LIB) clean
+# 	$(MAKE) -C $(COHMAP_DIR) clean
 	rm -rf $(OBJ_DIR) $(BIN_DIR)
 
 .PHONY: all clean run
