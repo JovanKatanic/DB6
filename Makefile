@@ -55,7 +55,7 @@ run: $(TARGET)
 	./$(TARGET)
 
 clean:
-	$(MAKE) -C $(UTILS_LIB) clean
+	$(MAKE) -C $(UTILS_DIR) clean
 # 	$(MAKE) -C $(COHMAP_DIR) clean
 	rm -rf $(OBJ_DIR) $(BIN_DIR)
 
